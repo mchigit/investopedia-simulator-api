@@ -10,11 +10,10 @@ class HeadlessClient:
             raise Exception("This class is a singleton!")
         else:
             chrome_options = Options()
-            chrome_options.headless = True
+            # chrome_options.headless = True
             chrome_options.add_argument('user-agent={}'.format(config.USER_AGENT))
             chrome_options.add_experimental_option('detach', True)
             driver = webdriver.Chrome(config.DRIVER_PATH, options=chrome_options)
-            driver.get
             HeadlessClient._instance = driver
 
     @staticmethod

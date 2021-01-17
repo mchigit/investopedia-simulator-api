@@ -5,9 +5,25 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 import pprint
+import schedule
+from threading import Thread, Event
+from time import sleep
 
 pp = pprint.PrettyPrinter(indent=4)
 
+exit_event = Event()
+
+def threaded_refresh(driver):
+    def refresh():
+        print("refreshing...")
+        driver.refresh()
+    schedule.every(10).seconds.do(refresh).tag('refresh-task')
+    while 1:
+        if not exit_event.is_set():
+            schedule.run_pending()
+            sleep(10)
+        else:
+            break
 
 class UserPortfolio:
     def __init__(self):
@@ -69,6 +85,9 @@ class Account:
         self.password = password
         self.user = None
 
+    def refreshSession(self):
+        HeadlessClient.getInstance().refresh()
+
     def authenticate(self):
         if not self.isLoggedIn:
             client = HeadlessClient.getInstance()
@@ -83,6 +102,8 @@ class Account:
             password.send_keys(self.password)
             loginButton.click()
             self.isLoggedIn = True
+            thread = Thread(target=threaded_refresh, args=(HeadlessClient.getInstance(), ))
+            thread.start()
             self.retrieveUserInfo()
         else:
             print("You are already authenticated.")
@@ -102,3 +123,6 @@ class Account:
 
     def closeSession(self):
         HeadlessClient.close()
+        print("Stopping thread from executing")
+        exit_event.set()
+        schedule.clear('refresh-task')
