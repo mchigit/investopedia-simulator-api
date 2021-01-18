@@ -1,14 +1,12 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 DESCRIPTION = "Investopedia simulator trading API"
 LONG_DESCRIPTION = (
     "An API that allows trading with stock simulator for from Investopedia"
 )
 
-install_requires = [
-    'seleniumUtil'
-]
+install_requires = ["selenium", "schedule"]
 
 setup(
     name="simulatorTradingApi",
@@ -24,6 +22,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
+    python_requires=">=3.7",
     include_package_data=True,
 )

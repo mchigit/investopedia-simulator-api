@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from ..config import config
 
+
 class HeadlessClient:
     _instance = None
 
@@ -11,8 +12,8 @@ class HeadlessClient:
         else:
             chrome_options = Options()
             # chrome_options.headless = True
-            chrome_options.add_argument('user-agent={}'.format(config.USER_AGENT))
-            chrome_options.add_experimental_option('detach', True)
+            chrome_options.add_argument("user-agent={}".format(config.USER_AGENT))
+            chrome_options.add_experimental_option("detach", True)
             driver = webdriver.Chrome(config.DRIVER_PATH, options=chrome_options)
             HeadlessClient._instance = driver
 
@@ -28,4 +29,4 @@ class HeadlessClient:
             print("Client is already closed")
         else:
             HeadlessClient._instance.close()
-            HeadlessClient._instance = None;
+            HeadlessClient._instance = None
