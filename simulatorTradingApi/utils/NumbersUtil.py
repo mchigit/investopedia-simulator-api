@@ -24,3 +24,20 @@ def extractPercentage(string):
         return round(number, 2)
     except ValueError:
         print("could not parse string")
+
+
+def extractTodaysChange(string):
+    """
+    Extract number from string following this pattern:
+    $300(3.00%) -> [300, 3]
+    -$123(-3.2%) -> [-123, -3.20]
+    Also will round to 2 decimal places
+    """
+    trimmed = string.strip()
+    strings = trimmed.split("(")
+    for i in range(len(strings)):
+        strings[i] = (
+            strings[i].replace("$", "").replace(")", "").replace("%", "").strip()
+        )
+
+    return strings

@@ -8,6 +8,9 @@ import schedule
 from threading import Thread, Event
 from time import sleep
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 exit_event = Event()
 
 
@@ -27,20 +30,21 @@ def threaded_refresh(driver):
 
 class Account:
     isLoggedIn = False
+    disableAutoRefresh = False
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, disableAutoRefresh=False):
         self.email = email
         self.password = password
-        self.user = None
+        self.disableAutoRefresh = disableAutoRefresh
+        self.authenticate()
 
     def refreshSession(self):
         HeadlessClient.getInstance().refresh()
 
     def authenticate(self):
-        if not self.isLoggedIn:
+        try:
             client = HeadlessClient.getInstance()
             client.get("https://www.investopedia.com/simulator/home.aspx")
-            client.save_screenshot("screenshot.png")
             loginButton = WebDriverWait(client, 10).until(
                 EC.presence_of_element_located((By.ID, "login"))
             )
@@ -49,37 +53,21 @@ class Account:
             username.send_keys(self.email)
             password.send_keys(self.password)
             loginButton.click()
-            self.isLoggedIn = True
-            thread = Thread(
-                target=threaded_refresh, args=(HeadlessClient.getInstance(),)
-            )
-            thread.start()
-            self.retrieveUserInfo()
-        else:
-            print("You are already authenticated.")
-
-    def retrieveUserInfo(self):
-        if not self.isLoggedIn:
-            print("You need to login first.")
-        else:
-            client = HeadlessClient.getInstance()
-            client.get("https://www.investopedia.com/simulator/portfolio/")
+            if not self.disableAutoRefresh:
+                thread = Thread(target=threaded_refresh, args=(client,))
+                thread.start()
             self.user = UserPortfolio()
+            self.isLoggedIn = True
+        except Exception as e:
+            logging.error("Failed to login.", exc_info == True)
 
     def closeSession(self):
         HeadlessClient.close()
-        print("Stopping thread from executing")
         exit_event.set()
         schedule.clear("refresh-task")
 
-    def getAccountStatus(self):
-        if not self.isLoggedIn:
-            print("You need to login first.")
-        else:
+    def getPortfolio(self):
+        if self.isLoggedIn:
             return self.user.getPortfolio()
-
-    def getHoldings(self):
-        if not self.isLoggedIn:
-            print("You need to login first.")
         else:
-            return self.user.getHoldings()
+            raise Exception("Please login first.")

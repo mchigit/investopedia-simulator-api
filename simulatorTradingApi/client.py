@@ -6,10 +6,10 @@ pp = pprint.PrettyPrinter(indent=4)
 
 account = Account("wuhui8013ee", "google@88")
 
-account.authenticate()
+holdings = account.user.getHoldings()
 
-pp.pprint(account.getAccountStatus())
-pp.pprint(account.getHoldings())
+for holding in holdings:
+    print(holding)
 
 account.closeSession()
 
