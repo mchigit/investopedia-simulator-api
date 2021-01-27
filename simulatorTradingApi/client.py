@@ -1,15 +1,17 @@
 from simulatorTradingApi.userAccount.Account import Account
+from simulatorTradingApi.trader.Trader import Trader, TRANSACTION_TYPE, DURATION
 
 import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 
-account = Account("wuhui8013ee", "google@88")
+account = Account("wuhui8013ee", "google@88", True)
 
-holdings = account.user.getHoldings()
+trader = Trader(account)
 
-for holding in holdings:
-    print(holding)
+trader.market_trade("ICLN", TRANSACTION_TYPE['BUY'], duration=DURATION['GOOD_TILL_CANCELLED'], quantity=20)
+
+
 
 account.closeSession()
 

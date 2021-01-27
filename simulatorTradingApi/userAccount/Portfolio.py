@@ -12,7 +12,7 @@ class UserPortfolio:
     buyingPower = 0
     cash = 0
     annualReturn = 0
-    holdings = None
+    __holdings = None
 
     def __init__(self):
         self.retrievePortfolio()
@@ -59,7 +59,7 @@ class UserPortfolio:
             self.buyingPower = extractNumberFromMoney(buyingPower)
             self.cash = extractNumberFromMoney(cash)
             self.annualReturn = extractPercentage(annualReturn)
-            self.holdings = Holdings()
+            self.__holdings = Holdings()
         except Exception as e:
             logging.error("Failed to retrieve user portfolio.", exc_info=True)
 
@@ -75,4 +75,4 @@ class UserPortfolio:
         self.retrievePortfolio()
 
     def getHoldings(self):
-        return self.holdings.getHoldings()
+        return self.__holdings.getHoldings()

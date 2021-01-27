@@ -37,7 +37,17 @@ def extractTodaysChange(string):
     strings = trimmed.split("(")
     for i in range(len(strings)):
         strings[i] = (
-            strings[i].replace("$", "").replace(")", "").replace("%", "").strip()
+            strings[i].replace("$", "").replace(
+                ")", "").replace("%", "").strip()
         )
 
     return strings
+
+
+def extractNumberFromSentence(string):
+    """
+    Extract number from a sentence string:
+    This is a sentence contain 32 numbers -> [32]
+    """
+    trimmed = string.strip()
+    return [int(s) for s in trimmed.split() if s.isdigit()]

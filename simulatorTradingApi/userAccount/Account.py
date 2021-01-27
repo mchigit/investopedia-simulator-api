@@ -31,6 +31,7 @@ def threaded_refresh(driver):
 class Account:
     isLoggedIn = False
     disableAutoRefresh = False
+    __portfolio = None
 
     def __init__(self, email, password, disableAutoRefresh=False):
         self.email = email
@@ -56,18 +57,29 @@ class Account:
             if not self.disableAutoRefresh:
                 thread = Thread(target=threaded_refresh, args=(client,))
                 thread.start()
-            self.user = UserPortfolio()
+            self.__portfolio = UserPortfolio()
             self.isLoggedIn = True
         except Exception as e:
-            logging.error("Failed to login.", exc_info == True)
+            logging.error("Failed to login.", exc_info=True)
+            self.closeSession()
 
+    @staticmethod
     def closeSession(self):
-        HeadlessClient.close()
-        exit_event.set()
-        schedule.clear("refresh-task")
+        if Account.isLoggedIn:
+            client = HeadlessClient.getInstance()
+            client.get("https://www.investopedia.com/simulator/logout.aspx")
+            HeadlessClient.close()
+            exit_event.set()
+            schedule.clear("refresh-task")
 
     def getPortfolio(self):
         if self.isLoggedIn:
-            return self.user.getPortfolio()
+            return self.__portfolio.getPortfolio()
+        else:
+            raise Exception("Please login first.")
+
+    def getHoldings(self):
+        if self.isLoggedIn:
+            return self.__portfolio.getHoldings()
         else:
             raise Exception("Please login first.")
