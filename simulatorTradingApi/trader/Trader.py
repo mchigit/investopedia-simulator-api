@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
-from simulatorTradingApi.utils.NumbersUtil import extractNumberFromSentence
+from simulatorTradingApi.utils.NumbersUtil import extract_number_from_sentence
 from simulatorTradingApi.userAccount.Account import Account
 
 import time
@@ -31,17 +31,47 @@ DURATION = {
 }
 
 
+def get_max_amount(symbol):
+    try:
+        client = HeadlessClient.get_instance()
+        symbol_input = WebDriverWait(client, 10).until(
+            EC.presence_of_element_located((By.ID, "symbolTextbox"))
+        )
+        symbol_input.send_keys(symbol)
+        symbol_input.send_keys(Keys.ENTER)
+        
+        client.implicitly_wait(3)
+
+        show_max_link = WebDriverWait(client, 10).until(
+            EC.presence_of_element_located((By.ID, "showMaxLink"))
+        )
+
+        show_max_link.click()
+
+        limitation_label = WebDriverWait(client, 10).until(
+            EC.visibility_of_element_located((By.ID, "limitationLabel"))
+        )
+
+        max_amount = extract_number_from_sentence(
+            limitation_label.get_attribute('innerText'))[0]
+
+        return max_amount
+
+    except Exception as e:
+        logging.error("Failed to get max amount.", exc_info=True)
+
+
 class Trader:
     def __init__(self, account):
-        if not account.isLoggedIn:
+        if not account.is_logged_in:
             raise Exception(
                 "Account is not logged in. Please authenticate first!")
         else:
             self.user = account
-            self.cash = account.getPortfolio()['cash']
+            self.cash = account.get_portfolio()['cash']
 
     def __set_market_trade_input(self, transcation_type, quantity, duration, send_confirmation):
-        client = HeadlessClient.getInstance()
+        client = HeadlessClient.get_instance()
 
         # set market trade radio
         market_trade_radio = client.find_element_by_id(
@@ -86,46 +116,86 @@ class Trader:
         # set quantity
         client.find_element_by_id('quantityTextbox').send_keys(str(quantity))
 
-    def market_trade(self, symbol, transcation_type, quantity, duration=DURATION['GOOD_TILL_CANCELLED'], sendConfirmation=True):
+    def __submit_order(self, client):
+        previewOrder = client.find_element_by_id('previewButton')
+        client.execute_script("arguments[0].click();", previewOrder)
+        submitOrder = WebDriverWait(client, 10).until(
+            EC.presence_of_element_located((By.ID, "submitOrder"))
+        )
+        client.execute_script("arguments[0].click();", submitOrder)
+    
+    def market_trade(self, symbol, transcation_type, quantity, duration=DURATION['GOOD_TILL_CANCELLED'], send_confirmation=True):
         try:
-            client = HeadlessClient.getInstance()
+            client = HeadlessClient.get_instance()
             client.get(
                 "https://www.investopedia.com/simulator/trade/tradestock.aspx")
 
-            symbolInput = WebDriverWait(client, 10).until(
-                EC.presence_of_element_located((By.ID, "symbolTextbox"))
-            )
-            symbolInput.send_keys(symbol)
-            symbolInput.send_keys(Keys.ENTER)
+            max_buy_amount = get_max_amount(symbol)
 
-            showMaxLink = WebDriverWait(client, 10).until(
-                EC.presence_of_element_located((By.ID, "showMaxLink"))
-            )
-
-            showMaxLink.click()
-
-            limitationLable = WebDriverWait(client, 10).until(
-                EC.visibility_of_element_located((By.ID, "limitationLabel"))
-            )
-
-            maxBuyAmount = extractNumberFromSentence(
-                limitationLable.get_attribute('innerText'))[0]
-
-            if quantity > maxBuyAmount:
+            if quantity > max_buy_amount:
                 logging.info(
-                    f"Cannot place an order with quantity higher than {maxBuyAmount}")
+                    f"Cannot place an order with quantity higher than {max_buy_amount}")
             else:
                 self.__set_market_trade_input(
-                    transcation_type, quantity, duration, False)
-                previewOrder = client.find_element_by_id('previewButton')
-                client.execute_script("arguments[0].click();", previewOrder)
-                submitOrder = WebDriverWait(client, 10).until(
-                    EC.presence_of_element_located((By.ID, "submitOrder"))
-                )
-                client.execute_script("arguments[0].click();", submitOrder)
+                    transcation_type, quantity, duration, send_confirmation)
+                
+                self.__submit_order(client)
+                
                 successMsg = f"Placed an order of {quantity} shares for {symbol}."
                 logging.info(successMsg)
 
         except Exception as e:
-            Account.closeSession()
+            logging.error("Failed to place trade.", exc_info=True)
+
+    def limit_trade(self, symbol, transcation_type, quantity, limit_price, duration=DURATION['GOOD_TILL_CANCELLED'], send_confirmation=True):
+        try:
+            client = HeadlessClient.get_instance()
+            client.get(
+                "https://www.investopedia.com/simulator/trade/tradestock.aspx")
+            
+            max_buy_amount = get_max_amount(symbol)
+            
+            if quantity > max_buy_amount:
+                logging.info(
+                    f"Cannot place an order with quantity higher than {max_buy_amount}")
+            else:
+                self.__set_market_trade_input(
+                    transcation_type, quantity, duration, send_confirmation)
+                
+                limitSaleButton = client.find_element_by_id('limitRadioButton')
+                limitSaleButton.click()
+                
+                limitPriceBox = client.find_element_by_id('limitPriceTextBox')
+                limitPriceBox.send_keys(str(limit_price))
+                
+                self.__submit_order(client)
+                
+        except Exception as e:
+            logging.error("Failed to place trade.", exc_info=True)
+    
+    
+    def stop_trade(self, symbol, transcation_type, quantity, stop_price, duration=DURATION['GOOD_TILL_CANCELLED'], send_confirmation=True):
+        try:
+            client = HeadlessClient.get_instance()
+            client.get(
+                "https://www.investopedia.com/simulator/trade/tradestock.aspx")
+            
+            max_buy_amount = get_max_amount(symbol)
+            
+            if quantity > max_buy_amount:
+                logging.info(
+                    f"Cannot place an order with quantity higher than {max_buy_amount}")
+            else:
+                self.__set_market_trade_input(
+                    transcation_type, quantity, duration, send_confirmation)
+                
+                limitSaleButton = client.find_element_by_id('stopRadioButton')
+                limitSaleButton.click()
+                
+                limitPriceBox = client.find_element_by_id('stopPriceTextBox')
+                limitPriceBox.send_keys(str(stop_price))
+                
+                self.__submit_order(client)
+                
+        except Exception as e:
             logging.error("Failed to place trade.", exc_info=True)

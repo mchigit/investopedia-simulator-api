@@ -1,5 +1,5 @@
 from ..seleniumUtil.HeadlessClient import HeadlessClient
-from ..utils.NumbersUtil import extractNumberFromMoney, extractPercentage
+from ..utils.NumbersUtil import extract_number_from_money, extract_percentage
 from .Holdings import Holdings
 
 import logging
@@ -8,18 +8,18 @@ logging.basicConfig(level=logging.INFO)
 
 
 class UserPortfolio:
-    accountValueUSD = 0
-    buyingPower = 0
+    account_value_usd = 0
+    buying_power = 0
     cash = 0
-    annualReturn = 0
+    annual_return = 0
     __holdings = None
 
     def __init__(self):
-        self.retrievePortfolio()
+        self.retrieve_portfolio()
 
-    def retrievePortfolio(self):
+    def retrieve_portfolio(self):
         try:
-            client = HeadlessClient.getInstance()
+            client = HeadlessClient.get_instance()
             client.get("https://www.investopedia.com/simulator/portfolio/")
             info = client.find_elements_by_class_name("infobar-title")
 
@@ -27,14 +27,14 @@ class UserPortfolio:
                 print("Failed to retrieve user portfolio")
                 return
 
-            accountValueUSD = (
+            account_value_usd = (
                 info[0]
                 .find_element_by_tag_name("p")
                 .find_element_by_css_selector(":nth-child(2)")
                 .get_attribute("innerText")
             )
 
-            buyingPower = (
+            buying_power = (
                 info[1]
                 .find_element_by_tag_name("p")
                 .find_element_by_css_selector(":nth-child(2)")
@@ -48,31 +48,32 @@ class UserPortfolio:
                 .get_attribute("innerText")
             )
 
-            annualReturn = (
+            annual_return = (
                 info[3]
                 .find_element_by_tag_name("p")
                 .find_element_by_css_selector(":nth-child(2)")
                 .get_attribute("innerText")
             )
 
-            self.accountValueUSD = extractNumberFromMoney(accountValueUSD)
-            self.buyingPower = extractNumberFromMoney(buyingPower)
-            self.cash = extractNumberFromMoney(cash)
-            self.annualReturn = extractPercentage(annualReturn)
+            self.account_value_usd = extract_number_from_money(account_value_usd)
+            self.buying_power = extract_number_from_money(buying_power)
+            self.cash = extract_number_from_money(cash)
+            self.annual_return = extract_percentage(annual_return)
             self.__holdings = Holdings()
+            
         except Exception as e:
             logging.error("Failed to retrieve user portfolio.", exc_info=True)
 
-    def getPortfolio(self):
+    def get_portfolio(self):
         return {
-            "accountValueUSD": self.accountValueUSD,
-            "buyingPower": self.buyingPower,
+            "account_value_usd": self.account_value_usd,
+            "buying_power": self.buying_power,
             "cash": self.cash,
-            "annualReturn": self.annualReturn,
+            "annual_return": self.annual_return,
         }
 
     def refresh(self):
-        self.retrievePortfolio()
+        self.retrieve_portfolio()
 
-    def getHoldings(self):
-        return self.__holdings.getHoldings()
+    def get_holdings(self):
+        return self.__holdings.get_holdings()

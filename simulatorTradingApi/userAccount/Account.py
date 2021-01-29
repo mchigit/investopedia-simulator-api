@@ -29,57 +29,56 @@ def threaded_refresh(driver):
 
 
 class Account:
-    isLoggedIn = False
-    disableAutoRefresh = False
+    is_logged_in = False
+    disable_auto_refresh = False
     __portfolio = None
 
-    def __init__(self, email, password, disableAutoRefresh=False):
+    def __init__(self, email, password, disable_auto_refresh=False):
         self.email = email
         self.password = password
-        self.disableAutoRefresh = disableAutoRefresh
+        self.disable_auto_refresh = disable_auto_refresh
         self.authenticate()
 
-    def refreshSession(self):
-        HeadlessClient.getInstance().refresh()
+    def refresh_session(self):
+        HeadlessClient.get_instance().refresh()
 
     def authenticate(self):
         try:
-            client = HeadlessClient.getInstance()
+            client = HeadlessClient.get_instance()
             client.get("https://www.investopedia.com/simulator/home.aspx")
-            loginButton = WebDriverWait(client, 10).until(
+            login_button = WebDriverWait(client, 10).until(
                 EC.presence_of_element_located((By.ID, "login"))
             )
             username = client.find_element_by_id("username")
             password = client.find_element_by_id("password")
             username.send_keys(self.email)
             password.send_keys(self.password)
-            loginButton.click()
-            if not self.disableAutoRefresh:
+            login_button.click()
+            
+            if not self.disable_auto_refresh:
                 thread = Thread(target=threaded_refresh, args=(client,))
                 thread.start()
             self.__portfolio = UserPortfolio()
-            self.isLoggedIn = True
+            self.is_logged_in = True
         except Exception as e:
             logging.error("Failed to login.", exc_info=True)
-            self.closeSession()
+            self.close_session
 
-    @staticmethod
-    def closeSession(self):
-        if Account.isLoggedIn:
-            client = HeadlessClient.getInstance()
-            client.get("https://www.investopedia.com/simulator/logout.aspx")
-            HeadlessClient.close()
-            exit_event.set()
-            schedule.clear("refresh-task")
+    def close_session(self):
+        client = HeadlessClient.get_instance()
+        client.get("https://www.investopedia.com/simulator/logout.aspx")
+        HeadlessClient.close()
+        exit_event.set()
+        schedule.clear("refresh-task")
 
-    def getPortfolio(self):
-        if self.isLoggedIn:
-            return self.__portfolio.getPortfolio()
+    def get_portfolio(self):
+        if self.is_logged_in:
+            return self.__portfolio.get_portfolio()
         else:
             raise Exception("Please login first.")
 
-    def getHoldings(self):
-        if self.isLoggedIn:
-            return self.__portfolio.getHoldings()
+    def get_holdings(self):
+        if self.is_logged_in:
+            return self.__portfolio.get_holdings()
         else:
             raise Exception("Please login first.")

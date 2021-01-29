@@ -1,4 +1,4 @@
-def extractNumberFromMoney(string):
+def extract_number_from_money(string):
     """
     Extract number from string following this pattern:
     $130,321 -> 130321
@@ -12,7 +12,7 @@ def extractNumberFromMoney(string):
         print("could not parse string")
 
 
-def extractPercentage(string):
+def extract_percentage(string):
     """
     Extract number from string following this pattern:
     78.80% -> 78.8
@@ -26,7 +26,7 @@ def extractPercentage(string):
         print("could not parse string")
 
 
-def extractTodaysChange(string):
+def extract_todays_change(string):
     """
     Extract number from string following this pattern:
     $300(3.00%) -> [300, 3]
@@ -44,7 +44,7 @@ def extractTodaysChange(string):
     return strings
 
 
-def extractNumberFromSentence(string):
+def extract_number_from_sentence(string):
     """
     Extract number from a sentence string:
     This is a sentence contain 32 numbers -> [32]
