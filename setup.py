@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 DESCRIPTION = "Investopedia simulator trading API"
 LONG_DESCRIPTION = (
     "An API that allows trading with stock simulator for from Investopedia"
