@@ -1,6 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from ..config import Config
+from ..config import DRIVER_PATH, USER_AGENT
 
 
 class HeadlessClient:
@@ -11,10 +11,11 @@ class HeadlessClient:
             raise Exception("This class is a singleton!")
         else:
             chrome_options = Options()
+            print(DRIVER_PATH)
             # chrome_options.headless = True
-            chrome_options.add_argument("user-agent={}".format(Config.USER_AGENT))
+            chrome_options.add_argument("user-agent={}".format(USER_AGENT))
             chrome_options.add_experimental_option("detach", True)
-            driver = webdriver.Chrome(Config.DRIVER_PATH, options=chrome_options)
+            driver = webdriver.Chrome(DRIVER_PATH, options=chrome_options)
             HeadlessClient._instance = driver
 
     @staticmethod

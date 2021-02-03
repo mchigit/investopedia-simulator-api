@@ -1,0 +1,4 @@
+schedule==1.0.0
+selenium==3.14.1
+simulatorTradingApi==0.0.4
+urllib3==1.23

@@ -2,45 +2,8 @@
 dist/
 build/
 venv/
-investopedia_simulator_trading_api.egg-info/
 
 .idea/
-
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@mchigit 
-Learn Git and GitHub without any code!
-Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
-
-
-github
-/
-gitignore
-3.2k
-113k
-61.1k
-Code
-Pull requests
-256
-Actions
-Projects
-Security
-Insights
-gitignore/Python.gitignore
-@pradyunsg
-pradyunsg Remove pip-wheel-metadata/ from Python.gitignore (#3364)
-…
-Latest commit 14f8a8b on Apr 11, 2020
- History
- 83 contributors
-@arcresu@shiftkey@Lucretiel@Harrison-G@jwg4@GabrielC101@misaelnieto@pmsosa@svkampen@vltr@thedrow@matheussl
-138 lines (112 sloc)  1.99 KB
   
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -178,17 +141,4 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
-# Cython debug symbols
-cython_debug/
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
+client.py
