@@ -72,9 +72,9 @@ for stock in stocks:
     print(stocks)
 ```
 
-<br />
-
 > It's important to remember to close the session once you are done with operations. If you don't close the session, the headless browser will remain open and the thread that is responsible for refreshing will keep executing.
+
+<br />
 
 ```python
 # Closing session
@@ -88,3 +88,27 @@ account.close_session()
 <br />
 
 ## Trading
+
+```python
+# Init Trader object
+trader = Trader(account)
+
+# Buy stock
+
+trader.buy("COST", PRICE_TYPE["LIMIT"], 2, limit_price=300, send_confirmation=False)
+
+trader.buy("COST", PRICE_TYPE["STOP"], 2, stop_price=200, send_confirmation=False)
+
+trader.buy("AMD", PRICE_TYPE["MARKET"], 2)
+
+# Sell Stock (trailing stop will be added soon)
+
+trader.sell('AAPL', PRICE_TYPE["STOP"], 10, stop_price=200, send_confirmation=False)
+
+trader.sell('AMD', PRICE_TYPE["LIMIT"], 10, limit_price=100, send_confirmation=False)
+
+trader.sell('AMD', PRICE_TYPE["LIMIT"], 2, limit_price=100, send_confirmation=False, trailing_stop=True)
+```
+
+
+# Detailed API
