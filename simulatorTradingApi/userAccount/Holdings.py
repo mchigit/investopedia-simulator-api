@@ -49,8 +49,6 @@ def extract_stock_info(stock_table_element):
         return stock_objects
     except Exception as e:
         logging.error("Failed to retrieve holdings.", exc_info=True)
-
-
 class Holdings:
 
     holdings = []
@@ -66,3 +64,5 @@ class Holdings:
         client.get("https://www.investopedia.com/simulator/portfolio/")
         stock_table = client.find_element_by_id("stock-portfolio-table")
         self.holdings = extract_stock_info(stock_table)
+    
+        

@@ -5,8 +5,8 @@ def extract_number_from_money(string):
     Also will round to 2 decimal places
     """
     try:
-        trimmed = string.strip().replace(",", "")
-        number = float(trimmed[1:])
+        trimmed = string.replace(",", "").replace("$", "").replace(" ", "").strip()
+        number = float(trimmed)
         return round(number, 2)
     except ValueError:
         print("could not parse string")
@@ -19,7 +19,7 @@ def extract_percentage(string):
     Also will round to 2 decimal places
     """
     try:
-        trimmed = string.strip().replace(",", "")
+        trimmed = string.strip().replace(",", "").replace(" ", "")
         number = float(trimmed[:-1])
         return round(number, 2)
     except ValueError:
@@ -33,7 +33,7 @@ def extract_todays_change(string):
     -$123(-3.2%) -> [-123, -3.20]
     Also will round to 2 decimal places
     """
-    trimmed = string.strip()
+    trimmed = string.strip().replace(" ", "")
     strings = trimmed.split("(")
     for i in range(len(strings)):
         strings[i] = (

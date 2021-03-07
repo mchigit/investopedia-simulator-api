@@ -45,19 +45,28 @@ class Account:
     def authenticate(self):
         try:
             client = HeadlessClient.get_instance()
-            client.get("https://www.investopedia.com/simulator/home.aspx")
-            login_button = WebDriverWait(client, 10).until(
+            client.get("https://www.investopedia.com/simulator")
+            login = WebDriverWait(client, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[value='Log In']"))
+            )
+            login.click()
+            
+            WebDriverWait(client, 10).until(
                 EC.presence_of_element_located((By.ID, "login"))
             )
             username = client.find_element_by_id("username")
             password = client.find_element_by_id("password")
             username.send_keys(self.email)
             password.send_keys(self.password)
-            login_button.click()
+            
+            client.find_element_by_css_selector("form").submit()
             
             if not self.disable_auto_refresh:
                 thread = Thread(target=threaded_refresh, args=(client,))
                 thread.start()
+            WebDriverWait(client, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "sim-page"))
+            )
             self.__portfolio = UserPortfolio()
             self.is_logged_in = True
         except Exception as e:

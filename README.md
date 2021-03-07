@@ -76,6 +76,15 @@ for stock in stocks:
 
 > It's important to remember to close the session once you are done with operations. If you don't close the session, the headless browser will remain open and the thread that is responsible for refreshing will keep executing.
 
+```python
+# Closing session
+"""
+This method will sign out of your account, and close the headless browser.
+"""
+
+account.close_session()
+```
+
 <br />
 
 ## Trading

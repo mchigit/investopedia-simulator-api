@@ -14,6 +14,9 @@ class HeadlessClient:
             print(DRIVER_PATH)
             # chrome_options.headless = True
             chrome_options.add_argument("user-agent={}".format(USER_AGENT))
+            chrome_options.add_argument("--incognito")
+            chrome_options.add_argument('--disable-extensions')
+            chrome_options.add_argument('--profile-directory=Default')
             chrome_options.add_experimental_option("detach", True)
             driver = webdriver.Chrome(DRIVER_PATH, options=chrome_options)
             HeadlessClient._instance = driver
